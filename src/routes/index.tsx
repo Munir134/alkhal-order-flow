@@ -272,7 +272,7 @@ function OrderModal({
                           </span>
                         </span>
                         <ArrowRight className="h-4 w-4 text-[color:var(--cream)]/40 transition-all duration-300 group-hover:text-[color:var(--gold)] group-hover:translate-x-1" />
-                      </a>
+                      </button>
                     </li>
                   ))}
                 </ul>
