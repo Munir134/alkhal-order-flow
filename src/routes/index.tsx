@@ -144,7 +144,8 @@ function Index() {
         open={open}
         step={step}
         onClose={() => setOpen(false)}
-        onDelivery={handleDelivery}
+        onDelivery={goToMenu}
+        onSelectBranch={goToMenu}
         onPickup={() => setStep("pickup")}
         onBack={() => setStep("choice")}
       />
