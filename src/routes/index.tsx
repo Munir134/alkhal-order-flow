@@ -36,6 +36,16 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("choice");
 
+  // Open the fulfillment modal on first visit (per session)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = sessionStorage.getItem("alkhal_fulfillment_seen");
+    if (!seen) {
+      setOpen(true);
+      sessionStorage.setItem("alkhal_fulfillment_seen", "1");
+    }
+  }, []);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
