@@ -58,8 +58,11 @@ function Index() {
     }
   }, [open]);
 
-  const handleDelivery = () => {
-    window.location.href = DELIVERY_URL;
+  const goToMenu = () => {
+    setOpen(false);
+    // Fallback: no menu section yet, so just close and scroll to top of page anchor if present
+    const el = document.getElementById("menu");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
