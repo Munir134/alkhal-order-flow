@@ -136,13 +136,6 @@ function Index() {
               Order Now
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
             </button>
-
-            <a
-              href="#menu"
-              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--cream)]/30 px-8 py-4 text-sm font-medium text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 hover:border-[color:var(--cream)]/60 transition-colors duration-300"
-            >
-              View Menu
-            </a>
           </div>
         </div>
       </section>

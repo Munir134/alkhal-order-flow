@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Alkhal Aldimashqi — A Taste of Damascus</title>
+<meta name="description" content="Heritage Damascene recipes, hand-plated. Order for pickup or delivery." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal-deep:#0d0b09;
+    --charcoal:#161311;
+    --charcoal-soft:#1f1a16;
+    --cream:#f2e8d8;
+    --gold:#d4a24a;
+    --gold-deep:#8a5f22;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--charcoal-deep);color:var(--cream);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .display{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:-.01em}
+  a{color:inherit;text-decoration:none}
+
+  /* HERO */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate}
+  .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+  .hero .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,11,9,.55) 0%,rgba(13,11,9,.75) 60%,rgba(13,11,9,.95) 100%);z-index:-1}
+  .hero .glow{position:absolute;inset:0;pointer-events:none;opacity:.30;mix-blend-mode:overlay;background:
+    radial-gradient(circle at 20% 30%, rgba(212,162,74,.4) 0, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(160,40,30,.45) 0, transparent 45%);z-index:-1}
+  .hero .content{position:relative;text-align:center;padding:6rem 1.5rem;max-width:64rem;margin:0 auto;width:100%}
+  .eyebrow{display:inline-flex;align-items:center;gap:1rem;color:var(--gold);font-size:.7rem;letter-spacing:.5em;text-transform:uppercase;font-weight:500;margin-bottom:1.5rem}
+  .eyebrow .line{width:3.5rem;height:1px;background:rgba(212,162,74,.6)}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:500;line-height:.95;font-size:clamp(3.5rem,10vw,7rem);margin:0}
+  h1 .italic{font-style:italic;background:linear-gradient(120deg,var(--gold) 0%,#f0d38a 50%,var(--gold-deep) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:block}
+  .lede{margin:2rem auto 0;max-width:36rem;color:rgba(242,232,216,.8);font-size:1.05rem;line-height:1.6}
+
+  .btn-primary{display:inline-flex;align-items:center;gap:.6rem;margin-top:3rem;background:var(--gold);color:var(--charcoal-deep);
+    padding:1rem 2.2rem;border-radius:999px;font-weight:600;font-size:.9rem;border:0;cursor:pointer;
+    box-shadow:0 10px 40px -10px rgba(212,162,74,.6);transition:background .3s ease,color .3s ease,transform .2s ease}
+  .btn-primary:hover{background:var(--gold-deep);color:var(--cream)}
+  .btn-primary svg{width:1rem;height:1rem}
+
+  /* MODAL */
+  .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem;
+    opacity:0;pointer-events:none;transition:opacity .3s ease}
+  .modal.open{opacity:1;pointer-events:auto}
+  .backdrop{position:absolute;inset:0;background:rgba(13,11,9,.85);backdrop-filter:blur(6px)}
+  .panel{position:relative;width:100%;max-width:32rem;background:var(--charcoal);border:1px solid rgba(212,162,74,.25);
+    border-radius:1rem;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);transform:translateY(1rem) scale(.95);
+    transition:transform .3s ease;background-image:radial-gradient(circle at 0% 0%,rgba(212,162,74,.08),transparent 55%)}
+  .modal.open .panel{transform:translateY(0) scale(1)}
+  .close{position:absolute;top:1rem;right:1rem;background:transparent;border:0;color:rgba(242,232,216,.6);
+    padding:.5rem;border-radius:999px;cursor:pointer;transition:background .2s,color .2s;display:inline-flex}
+  .close:hover{color:var(--cream);background:rgba(242,232,216,.1)}
+  .panel .inner{padding:2.5rem 2rem 2rem}
+  .head{text-align:center}
+  .head .eyebrow{font-size:.65rem;letter-spacing:.45em;margin-bottom:1rem}
+  .head .eyebrow .line{width:2rem;background:rgba(212,162,74,.5)}
+  .head h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:2rem;margin:0;color:var(--cream)}
+  .head p{margin:.5rem 0 0;color:rgba(242,232,216,.6);font-size:.9rem}
+
+  /* Sliding stage */
+  .stage{position:relative;margin-top:2rem;overflow:hidden}
+  .track{display:flex;width:200%;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+  .track.step-pickup{transform:translateX(-50%)}
+  .slide{width:50%;flex-shrink:0}
+  .slide.left{padding-right:.25rem}
+  .slide.right{padding-left:.25rem}
+
+  .choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
+  .choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;
+    padding:2rem 1.5rem;border-radius:.85rem;border:1px solid rgba(212,162,74,.25);
+    background:rgba(31,26,22,.6);color:var(--cream);cursor:pointer;font-family:inherit;
+    transition:background .3s,border-color .3s}
+  .choice:hover{background:var(--charcoal-deep);border-color:rgba(212,162,74,.6)}
+  .icon-circle{width:3rem;height:3rem;border-radius:999px;border:1px solid rgba(212,162,74,.4);
+    color:var(--gold);display:inline-flex;align-items:center;justify-content:center;transition:background .3s,color .3s}
+  .choice:hover .icon-circle{background:var(--gold);color:var(--charcoal-deep)}
+  .choice .label{font-family:'Cormorant Garamond',serif;font-size:1.5rem;line-height:1}
+  .choice .hint{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(242,232,216,.55)}
+
+  .branch-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.65rem}
+  .branch{display:flex;align-items:center;gap:1rem;width:100%;padding:.9rem 1rem;text-align:left;
+    background:rgba(31,26,22,.6);border:1px solid rgba(242,232,216,.1);border-radius:.75rem;color:var(--cream);
+    cursor:pointer;font-family:inherit;transition:background .3s,border-color .3s}
+  .branch:hover{background:var(--charcoal-deep);border-color:rgba(212,162,74,.4)}
+  .branch .icon-circle{width:2.5rem;height:2.5rem}
+  .branch .info{flex:1}
+  .branch .name{display:block;font-family:'Cormorant Garamond',serif;font-size:1.25rem;line-height:1.1}
+  .branch .tag{display:block;font-size:.75rem;color:rgba(242,232,216,.55);margin-top:.15rem}
+  .branch .arrow{color:rgba(242,232,216,.4);transition:color .3s,transform .3s}
+  .branch:hover .arrow{color:var(--gold);transform:translateX(4px)}
+
+  .back{margin-top:1.25rem;background:transparent;border:0;color:rgba(242,232,216,.6);
+    font-family:inherit;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;transition:color .3s}
+  .back:hover{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <img class="bg" src="hero.jpg" alt="A Damascene feast with candlelight and heritage plating" />
+  <div class="overlay"></div>
+  <div class="glow"></div>
+  <div class="content">
+    <div class="eyebrow"><span class="line"></span>A Taste of Damascus<span class="line"></span></div>
+    <h1><span>ALKHAL</span><span class="italic">ALDIMASHQI</span></h1>
+    <p class="lede">Heritage recipes, hand-plated. From the old city of Damascus to your table.</p>
+    <button class="btn-primary" id="openBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Order Now
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>
+  </div>
+</section>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="panel" role="dialog" aria-modal="true">
+    <button class="close" data-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <div class="inner">
+      <div class="head">
+        <div class="eyebrow"><span class="line"></span><span id="eyebrowText">Place an order</span><span class="line"></span></div>
+        <h2 id="titleText">How would you like it?</h2>
+        <p id="subText">Delivered warm to your door, or ready at the counter.</p>
+      </div>
+      <div class="stage">
+        <div class="track" id="track">
+          <div class="slide left">
+            <div class="choice-grid">
+              <button class="choice" id="pickupBtn">
+                <span class="icon-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+                <span class="label">Pickup</span>
+                <span class="hint">Ready at counter</span>
+              </button>
+              <button class="choice" id="deliveryBtn">
+                <span class="icon-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0 0 2h1l3.4 5.5"/><path d="M14 17.5V14l-3-3-4 2"/></svg></span>
+                <span class="label">Delivery</span>
+                <span class="hint">To your door</span>
+              </button>
+            </div>
+          </div>
+          <div class="slide right">
+            <ul class="branch-list" id="branchList"></ul>
+            <button class="back" id="backBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const MENU_URL = "https://damascene.vercel.app/";
+  const BRANCHES = [
+    { name: "Al-Zahra",   tagline: "The flagship — old city quarter" },
+    { name: "Al-Andalus", tagline: "Riverside courtyard dining" },
+    { name: "Al-Safa",    tagline: "Modern quarter, heritage kitchen" },
+  ];
+
+  const modal = document.getElementById('modal');
+  const track = document.getElementById('track');
+  const eyebrowText = document.getElementById('eyebrowText');
+  const titleText = document.getElementById('titleText');
+  const subText = document.getElementById('subText');
+
+  function openModal(){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; setTimeout(()=>setStep('choice'),300); }
+  function setStep(step){
+    if(step==='pickup'){
+      track.classList.add('step-pickup');
+      eyebrowText.textContent='Choose a branch';
+      titleText.textContent='Pickup location';
+      subText.textContent="Select the branch you'd like to collect from.";
+    } else {
+      track.classList.remove('step-pickup');
+      eyebrowText.textContent='Place an order';
+      titleText.textContent='How would you like it?';
+      subText.textContent='Delivered warm to your door, or ready at the counter.';
+    }
+  }
+  function goToMenu(){ closeModal(); window.location.href = MENU_URL; }
+
+  // Build branch list
+  const list = document.getElementById('branchList');
+  BRANCHES.forEach(b=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<button class="branch" type="button">
+      <span class="icon-circle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      <span class="info"><span class="name">${b.name}</span><span class="tag">${b.tagline}</span></span>
+      <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>`;
+    li.querySelector('button').addEventListener('click', goToMenu);
+    list.appendChild(li);
+  });
+
+  document.getElementById('openBtn').addEventListener('click', openModal);
+  document.getElementById('pickupBtn').addEventListener('click', ()=>setStep('pickup'));
+  document.getElementById('deliveryBtn').addEventListener('click', goToMenu);
+  document.getElementById('backBtn').addEventListener('click', ()=>setStep('choice'));
+  document.querySelectorAll('[data-close]').forEach(el=>el.addEventListener('click', closeModal));
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+  // Open on first visit per session
+  try {
+    if(!sessionStorage.getItem('alkhal_fulfillment_seen')){
+      openModal();
+      sessionStorage.setItem('alkhal_fulfillment_seen','1');
+    }
+  } catch(_) { openModal(); }
+</script>
+</body>
+</html>
