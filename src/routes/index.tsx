@@ -136,14 +136,6 @@ function Index() {
               Order Now
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
             </button>
-
-            <a
-              href="#menu"
-              className="hidden"
-              aria-hidden="true"
-            >
-              View Menu
-            </a>
           </div>
         </div>
       </section>
