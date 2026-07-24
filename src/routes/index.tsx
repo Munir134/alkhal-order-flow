@@ -60,9 +60,7 @@ function Index() {
 
   const goToMenu = () => {
     setOpen(false);
-    // Fallback: no menu section yet, so just close and scroll to top of page anchor if present
-    const el = document.getElementById("menu");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    window.location.href = "https://damascene.vercel.app/";
   };
 
   return (
