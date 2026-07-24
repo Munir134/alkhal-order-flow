@@ -58,8 +58,11 @@ function Index() {
     }
   }, [open]);
 
-  const handleDelivery = () => {
-    window.location.href = DELIVERY_URL;
+  const goToMenu = () => {
+    setOpen(false);
+    // Fallback: no menu section yet, so just close and scroll to top of page anchor if present
+    const el = document.getElementById("menu");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -141,7 +144,8 @@ function Index() {
         open={open}
         step={step}
         onClose={() => setOpen(false)}
-        onDelivery={handleDelivery}
+        onDelivery={goToMenu}
+        onSelectBranch={goToMenu}
         onPickup={() => setStep("pickup")}
         onBack={() => setStep("choice")}
       />
@@ -154,6 +158,7 @@ function OrderModal({
   step,
   onClose,
   onDelivery,
+  onSelectBranch,
   onPickup,
   onBack,
 }: {
@@ -161,6 +166,7 @@ function OrderModal({
   step: Step;
   onClose: () => void;
   onDelivery: () => void;
+  onSelectBranch: () => void;
   onPickup: () => void;
   onBack: () => void;
 }) {
@@ -249,9 +255,10 @@ function OrderModal({
                 <ul className="space-y-2.5">
                   {BRANCHES.map((b) => (
                     <li key={b.id}>
-                      <a
-                        href={b.url}
-                        className="group flex items-center gap-4 rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/60 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/40"
+                      <button
+                        type="button"
+                        onClick={onSelectBranch}
+                        className="group flex w-full items-center gap-4 rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/60 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/40"
                       >
                         <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)] transition-colors duration-300 group-hover:bg-[color:var(--gold)] group-hover:text-[color:var(--charcoal-deep)]">
                           <MapPin className="h-4 w-4" />
@@ -265,7 +272,7 @@ function OrderModal({
                           </span>
                         </span>
                         <ArrowRight className="h-4 w-4 text-[color:var(--cream)]/40 transition-all duration-300 group-hover:text-[color:var(--gold)] group-hover:translate-x-1" />
-                      </a>
+                      </button>
                     </li>
                   ))}
                 </ul>
