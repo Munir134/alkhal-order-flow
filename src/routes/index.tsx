@@ -158,6 +158,7 @@ function OrderModal({
   step,
   onClose,
   onDelivery,
+  onSelectBranch,
   onPickup,
   onBack,
 }: {
@@ -165,6 +166,7 @@ function OrderModal({
   step: Step;
   onClose: () => void;
   onDelivery: () => void;
+  onSelectBranch: () => void;
   onPickup: () => void;
   onBack: () => void;
 }) {
