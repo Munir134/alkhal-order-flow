@@ -139,7 +139,8 @@ function Index() {
 
             <a
               href="#menu"
-              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--cream)]/30 px-8 py-4 text-sm font-medium text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 hover:border-[color:var(--cream)]/60 transition-colors duration-300"
+              className="hidden"
+              aria-hidden="true"
             >
               View Menu
             </a>
