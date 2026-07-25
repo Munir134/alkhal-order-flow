@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X } from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2 } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
+
+const DeliveryLocationPicker = lazy(
+  () => import("@/components/DeliveryLocationPicker"),
+);
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
-
-const DELIVERY_URL = "https://delivery.alkhal.com";
 
 const BRANCHES = [
   {
