@@ -147,7 +147,13 @@ function Index() {
         open={open}
         step={step}
         onClose={() => setOpen(false)}
-        onDelivery={goToMenu}
+        onDelivery={() => setStep("delivery")}
+        onConfirmDelivery={(loc) => {
+          try {
+            sessionStorage.setItem("alkhal_delivery", JSON.stringify(loc));
+          } catch {}
+          goToMenu();
+        }}
         onSelectBranch={goToMenu}
         onPickup={() => setStep("pickup")}
         onBack={() => setStep("choice")}
