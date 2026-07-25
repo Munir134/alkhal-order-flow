@@ -167,6 +167,7 @@ function OrderModal({
   step,
   onClose,
   onDelivery,
+  onConfirmDelivery,
   onSelectBranch,
   onPickup,
   onBack,
@@ -175,14 +176,16 @@ function OrderModal({
   step: Step;
   onClose: () => void;
   onDelivery: () => void;
+  onConfirmDelivery: (loc: { lat: number; lng: number; address: string }) => void;
   onSelectBranch: () => void;
   onPickup: () => void;
   onBack: () => void;
 }) {
+  const isDelivery = step === "delivery";
   return (
     <div
       aria-hidden={!open}
-      className={`fixed inset-0 z-50 flex items-center justify-center px-4 transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center px-4 py-6 transition-opacity duration-300 ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
     >
@@ -197,7 +200,9 @@ function OrderModal({
         role="dialog"
         aria-modal="true"
         aria-label="How would you like your order?"
-        className={`relative w-full max-w-lg rounded-2xl border border-[color:var(--gold)]/25 bg-[color:var(--charcoal)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] transition-all duration-300 ${
+        className={`relative w-full ${
+          isDelivery ? "max-w-2xl" : "max-w-lg"
+        } max-h-[92vh] overflow-y-auto rounded-2xl border border-[color:var(--gold)]/25 bg-[color:var(--charcoal)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 ${
           open ? "translate-y-0 scale-100" : "translate-y-4 scale-95"
         }`}
         style={{
@@ -208,94 +213,126 @@ function OrderModal({
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 rounded-full p-2 text-[color:var(--cream)]/60 hover:text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 transition-colors"
+          className="absolute right-4 top-4 z-10 rounded-full p-2 text-[color:var(--cream)]/60 hover:text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="px-8 pt-10 pb-8">
+        <div className={`${isDelivery ? "px-6 sm:px-8" : "px-8"} pt-10 pb-8`}>
           {/* Header */}
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center gap-3 mb-4">
               <span className="h-px w-8 bg-[color:var(--gold)]/50" />
               <span className="text-[color:var(--gold)] text-[0.65rem] tracking-[0.45em] uppercase">
-                {step === "choice" ? "Place an order" : "Choose a branch"}
+                {step === "choice"
+                  ? "Place an order"
+                  : step === "pickup"
+                    ? "Choose a branch"
+                    : "Delivery address"}
               </span>
               <span className="h-px w-8 bg-[color:var(--gold)]/50" />
             </div>
             <h2 className="font-display text-3xl sm:text-4xl text-[color:var(--cream)]">
-              {step === "choice" ? "How would you like it?" : "Pickup location"}
+              {step === "choice"
+                ? "How would you like it?"
+                : step === "pickup"
+                  ? "Pickup location"
+                  : "Where should we send it?"}
             </h2>
             <p className="mt-2 text-sm text-[color:var(--cream)]/60">
               {step === "choice"
                 ? "Delivered warm to your door, or ready at the counter."
-                : "Select the branch you'd like to collect from."}
+                : step === "pickup"
+                  ? "Select the branch you'd like to collect from."
+                  : "Drop the pin on your door, or search for your address."}
             </p>
           </div>
 
-          {/* Sliding stage */}
-          <div className="relative mt-8 overflow-hidden">
-            <div
-              className="flex w-[200%] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                transform: step === "choice" ? "translateX(0%)" : "translateX(-50%)",
-              }}
-            >
-              {/* Step 1: Choice */}
-              <div className="w-1/2 shrink-0 pr-1">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <ChoiceCard
-                    icon={<ShoppingBag className="h-6 w-6" />}
-                    label="Pickup"
-                    hint="Ready at the counter"
-                    onClick={onPickup}
-                  />
-                  <ChoiceCard
-                    icon={<Bike className="h-6 w-6" />}
-                    label="Delivery"
-                    hint="Straight to your door"
-                    onClick={onDelivery}
-                  />
+          {isDelivery ? (
+            <div className="mt-6">
+              <Suspense
+                fallback={
+                  <div className="grid h-72 place-items-center rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/40">
+                    <Loader2 className="h-6 w-6 animate-spin text-[color:var(--gold)]" />
+                  </div>
+                }
+              >
+                <DeliveryLocationPicker onConfirm={onConfirmDelivery} />
+              </Suspense>
+              <button
+                onClick={onBack}
+                className="mt-5 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--cream)]/60 hover:text-[color:var(--gold)] transition-colors duration-300"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back
+              </button>
+            </div>
+          ) : (
+            /* Sliding stage for choice / pickup */
+            <div className="relative mt-8 overflow-hidden">
+              <div
+                className="flex w-[200%] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{
+                  transform:
+                    step === "pickup" ? "translateX(-50%)" : "translateX(0%)",
+                }}
+              >
+                {/* Step 1: Choice */}
+                <div className="w-1/2 shrink-0 pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <ChoiceCard
+                      icon={<ShoppingBag className="h-6 w-6" />}
+                      label="Pickup"
+                      hint="Ready at the counter"
+                      onClick={onPickup}
+                    />
+                    <ChoiceCard
+                      icon={<Bike className="h-6 w-6" />}
+                      label="Delivery"
+                      hint="Straight to your door"
+                      onClick={onDelivery}
+                    />
+                  </div>
+                </div>
+
+                {/* Step 2: Pickup locations */}
+                <div className="w-1/2 shrink-0 pl-1">
+                  <ul className="space-y-2.5">
+                    {BRANCHES.map((b) => (
+                      <li key={b.id}>
+                        <button
+                          type="button"
+                          onClick={onSelectBranch}
+                          className="group flex w-full items-center gap-4 rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/60 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/40"
+                        >
+                          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)] transition-colors duration-300 group-hover:bg-[color:var(--gold)] group-hover:text-[color:var(--charcoal-deep)]">
+                            <MapPin className="h-4 w-4" />
+                          </span>
+                          <span className="flex-1">
+                            <span className="block font-display text-xl leading-tight text-[color:var(--cream)]">
+                              {b.name}
+                            </span>
+                            <span className="block text-xs text-[color:var(--cream)]/55">
+                              {b.tagline}
+                            </span>
+                          </span>
+                          <ArrowRight className="h-4 w-4 text-[color:var(--cream)]/40 transition-all duration-300 group-hover:text-[color:var(--gold)] group-hover:translate-x-1" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={onBack}
+                    className="mt-5 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--cream)]/60 hover:text-[color:var(--gold)] transition-colors duration-300"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Back
+                  </button>
                 </div>
               </div>
-
-              {/* Step 2: Pickup locations */}
-              <div className="w-1/2 shrink-0 pl-1">
-                <ul className="space-y-2.5">
-                  {BRANCHES.map((b) => (
-                    <li key={b.id}>
-                      <button
-                        type="button"
-                        onClick={onSelectBranch}
-                        className="group flex w-full items-center gap-4 rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/60 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/40"
-                      >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)] transition-colors duration-300 group-hover:bg-[color:var(--gold)] group-hover:text-[color:var(--charcoal-deep)]">
-                          <MapPin className="h-4 w-4" />
-                        </span>
-                        <span className="flex-1">
-                          <span className="block font-display text-xl leading-tight text-[color:var(--cream)]">
-                            {b.name}
-                          </span>
-                          <span className="block text-xs text-[color:var(--cream)]/55">
-                            {b.tagline}
-                          </span>
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-[color:var(--cream)]/40 transition-all duration-300 group-hover:text-[color:var(--gold)] group-hover:translate-x-1" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={onBack}
-                  className="mt-5 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--cream)]/60 hover:text-[color:var(--gold)] transition-colors duration-300"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  Back
-                </button>
-              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
