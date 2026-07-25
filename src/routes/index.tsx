@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2, Languages } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
 
 const DeliveryLocationPicker = lazy(
@@ -11,32 +11,82 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+type Lang = "en" | "ar";
+
 const BRANCHES = [
   {
     id: "al-zahra",
-    name: "Al-Zahra",
-    tagline: "The flagship — old city quarter",
+    name: { en: "Al-Zahra", ar: "الزهراء" },
+    tagline: { en: "The flagship — old city quarter", ar: "الفرع الرئيسي — حي المدينة القديمة" },
     url: "https://order.alkhal.com/al-zahra",
   },
   {
     id: "al-andalus",
-    name: "Al-Andalus",
-    tagline: "Riverside courtyard dining",
+    name: { en: "Al-Andalus", ar: "الأندلس" },
+    tagline: { en: "Riverside courtyard dining", ar: "طعام في فناء على ضفة النهر" },
     url: "https://order.alkhal.com/al-andalus",
   },
   {
     id: "al-safa",
-    name: "Al-Safa",
-    tagline: "Modern quarter, heritage kitchen",
+    name: { en: "Al-Safa", ar: "الصفا" },
+    tagline: { en: "Modern quarter, heritage kitchen", ar: "حي عصري، مطبخ تراثي" },
     url: "https://order.alkhal.com/al-safa",
   },
 ];
+
+const T = {
+  en: {
+    tagline: "A Taste of Damascus",
+    heroSub: "Heritage recipes, hand-plated. From the old city of Damascus to your table.",
+    orderNow: "Order Now",
+    switchLang: "العربية",
+    eyebrowChoice: "Place an order",
+    eyebrowPickup: "Choose a branch",
+    eyebrowDelivery: "Delivery address",
+    titleChoice: "How would you like it?",
+    titlePickup: "Pickup location",
+    titleDelivery: "Where should we send it?",
+    subChoice: "Delivered warm to your door, or ready at the counter.",
+    subPickup: "Select the branch you'd like to collect from.",
+    subDelivery: "Drop the pin on your door, or search for your address.",
+    pickup: "Pickup",
+    pickupHint: "Ready at the counter",
+    delivery: "Delivery",
+    deliveryHint: "Straight to your door",
+    back: "Back",
+    close: "Close",
+  },
+  ar: {
+    tagline: "نكهة من دمشق",
+    heroSub: "وصفات تراثية، تُقدَّم بعناية. من مدينة دمشق القديمة إلى مائدتك.",
+    orderNow: "اطلب الآن",
+    switchLang: "English",
+    eyebrowChoice: "اطلب الآن",
+    eyebrowPickup: "اختر الفرع",
+    eyebrowDelivery: "عنوان التوصيل",
+    titleChoice: "كيف تحب أن تستلم طلبك؟",
+    titlePickup: "موقع الاستلام",
+    titleDelivery: "إلى أين نرسله؟",
+    subChoice: "يصل ساخناً إلى باب بيتك، أو جاهز عند المطعم.",
+    subPickup: "اختر الفرع الذي تود الاستلام منه.",
+    subDelivery: "حرّك الدبوس على بابك، أو ابحث عن عنوانك.",
+    pickup: "استلام",
+    pickupHint: "جاهز عند المطعم",
+    delivery: "توصيل",
+    deliveryHint: "إلى باب بيتك",
+    back: "رجوع",
+    close: "إغلاق",
+  },
+} as const;
 
 type Step = "choice" | "pickup" | "delivery";
 
 function Index() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("choice");
+  const [lang, setLang] = useState<Lang>("en");
+  const t = T[lang];
+  const isRTL = lang === "ar";
 
   // Open the fulfillment modal on first visit (per session)
   useEffect(() => {
@@ -46,7 +96,18 @@ function Index() {
       setOpen(true);
       sessionStorage.setItem("alkhal_fulfillment_seen", "1");
     }
+    const savedLang = localStorage.getItem("alkhal_lang");
+    if (savedLang === "ar" || savedLang === "en") setLang(savedLang);
   }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isRTL ? "rtl" : "ltr";
+    try {
+      localStorage.setItem("alkhal_lang", lang);
+    } catch {}
+  }, [lang, isRTL]);
 
   useEffect(() => {
     if (!open) return;
@@ -64,7 +125,6 @@ function Index() {
 
   useEffect(() => {
     if (!open) {
-      // reset step when modal closes (after animation)
       const t = setTimeout(() => setStep("choice"), 250);
       return () => clearTimeout(t);
     }
@@ -75,8 +135,10 @@ function Index() {
     window.location.href = "https://damascene.vercel.app/";
   };
 
+  const toggleLang = () => setLang((l) => (l === "en" ? "ar" : "en"));
+
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
       {/* HERO */}
       <section className="relative isolate overflow-hidden min-h-screen flex items-center">
         <img
@@ -98,11 +160,23 @@ function Index() {
           }}
         />
 
+        {/* Language toggle */}
+        <button
+          onClick={toggleLang}
+          aria-label="Toggle language"
+          className={`absolute top-6 z-20 inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--charcoal-deep)]/60 backdrop-blur px-4 py-2 text-xs uppercase tracking-[0.3em] text-[color:var(--cream)] hover:bg-[color:var(--gold)] hover:text-[color:var(--charcoal-deep)] transition-colors duration-300 ${
+            isRTL ? "left-6" : "right-6"
+          }`}
+        >
+          <Languages className="h-3.5 w-3.5" />
+          {t.switchLang}
+        </button>
+
         <div className="relative mx-auto max-w-5xl px-6 py-24 sm:py-32 text-center text-[color:var(--cream)] w-full">
           <div className="mx-auto flex items-center justify-center gap-4 mb-6">
             <span className="h-px w-14 bg-[color:var(--gold)]/60" />
             <span className="text-[color:var(--gold)] text-[0.7rem] tracking-[0.5em] uppercase font-medium">
-              A Taste of Damascus
+              {t.tagline}
             </span>
             <span className="h-px w-14 bg-[color:var(--gold)]/60" />
           </div>
@@ -110,7 +184,7 @@ function Index() {
           <h1
             className="font-display font-medium tracking-tight leading-[0.95] text-6xl sm:text-7xl md:text-8xl"
           >
-            <span className="block">ALKHAL</span>
+            <span className="block">{isRTL ? "الخال" : "ALKHAL"}</span>
             <span
               className="block italic"
               style={{
@@ -121,12 +195,12 @@ function Index() {
                 color: "transparent",
               }}
             >
-              ALDIMASHQI
+              {isRTL ? "الدمشقي" : "ALDIMASHQI"}
             </span>
           </h1>
 
           <p className="mt-8 max-w-xl mx-auto text-base sm:text-lg text-[color:var(--cream)]/80 leading-relaxed">
-            Heritage recipes, hand-plated. From the old city of Damascus to your table.
+            {t.heroSub}
           </p>
 
           <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
@@ -135,8 +209,8 @@ function Index() {
               className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--gold)] px-8 py-4 text-sm font-semibold text-[color:var(--charcoal-deep)] shadow-[0_10px_40px_-10px_oklch(0.75_0.13_82/0.6)] hover:bg-[color:var(--gold-deep)] hover:text-[color:var(--cream)] transition-colors duration-300"
             >
               <ShoppingBag className="h-4 w-4" />
-              Order Now
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              {t.orderNow}
+              <ArrowRight className={`h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 ${isRTL ? "rotate-180" : ""}`} />
             </button>
           </div>
         </div>
@@ -146,6 +220,10 @@ function Index() {
       <OrderModal
         open={open}
         step={step}
+        lang={lang}
+        t={t}
+        isRTL={isRTL}
+        onToggleLang={toggleLang}
         onClose={() => setOpen(false)}
         onDelivery={() => setStep("delivery")}
         onConfirmDelivery={(loc) => {
@@ -165,6 +243,10 @@ function Index() {
 function OrderModal({
   open,
   step,
+  lang,
+  t,
+  isRTL,
+  onToggleLang,
   onClose,
   onDelivery,
   onConfirmDelivery,
@@ -174,6 +256,10 @@ function OrderModal({
 }: {
   open: boolean;
   step: Step;
+  lang: Lang;
+  t: (typeof T)[Lang];
+  isRTL: boolean;
+  onToggleLang: () => void;
   onClose: () => void;
   onDelivery: () => void;
   onConfirmDelivery: (loc: { lat: number; lng: number; address: string }) => void;
@@ -185,6 +271,7 @@ function OrderModal({
   return (
     <div
       aria-hidden={!open}
+      dir={isRTL ? "rtl" : "ltr"}
       className={`fixed inset-0 z-50 flex items-center justify-center px-4 py-6 transition-opacity duration-300 ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
@@ -199,7 +286,7 @@ function OrderModal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="How would you like your order?"
+        aria-label={t.titleChoice}
         className={`relative w-full ${
           isDelivery ? "max-w-2xl" : "max-w-lg"
         } max-h-[92vh] overflow-y-auto rounded-2xl border border-[color:var(--gold)]/25 bg-[color:var(--charcoal)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 ${
@@ -210,41 +297,55 @@ function OrderModal({
             "radial-gradient(circle at 0% 0%, oklch(0.75 0.13 82 / 0.08), transparent 55%)",
         }}
       >
+        {/* Lang toggle inside modal */}
+        <button
+          onClick={onToggleLang}
+          aria-label="Toggle language"
+          className={`absolute top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-[color:var(--gold)]/30 px-3 py-1.5 text-[0.65rem] uppercase tracking-[0.3em] text-[color:var(--cream)]/80 hover:bg-[color:var(--gold)] hover:text-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)] transition-colors ${
+            isRTL ? "right-4" : "left-4"
+          }`}
+        >
+          <Languages className="h-3 w-3" />
+          {t.switchLang}
+        </button>
+
         <button
           onClick={onClose}
-          aria-label="Close"
-          className="absolute right-4 top-4 z-10 rounded-full p-2 text-[color:var(--cream)]/60 hover:text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 transition-colors"
+          aria-label={t.close}
+          className={`absolute top-4 z-10 rounded-full p-2 text-[color:var(--cream)]/60 hover:text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 transition-colors ${
+            isRTL ? "left-4" : "right-4"
+          }`}
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className={`${isDelivery ? "px-6 sm:px-8" : "px-8"} pt-10 pb-8`}>
+        <div className={`${isDelivery ? "px-6 sm:px-8" : "px-8"} pt-14 pb-8`}>
           {/* Header */}
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center gap-3 mb-4">
               <span className="h-px w-8 bg-[color:var(--gold)]/50" />
               <span className="text-[color:var(--gold)] text-[0.65rem] tracking-[0.45em] uppercase">
                 {step === "choice"
-                  ? "Place an order"
+                  ? t.eyebrowChoice
                   : step === "pickup"
-                    ? "Choose a branch"
-                    : "Delivery address"}
+                    ? t.eyebrowPickup
+                    : t.eyebrowDelivery}
               </span>
               <span className="h-px w-8 bg-[color:var(--gold)]/50" />
             </div>
             <h2 className="font-display text-3xl sm:text-4xl text-[color:var(--cream)]">
               {step === "choice"
-                ? "How would you like it?"
+                ? t.titleChoice
                 : step === "pickup"
-                  ? "Pickup location"
-                  : "Where should we send it?"}
+                  ? t.titlePickup
+                  : t.titleDelivery}
             </h2>
             <p className="mt-2 text-sm text-[color:var(--cream)]/60">
               {step === "choice"
-                ? "Delivered warm to your door, or ready at the counter."
+                ? t.subChoice
                 : step === "pickup"
-                  ? "Select the branch you'd like to collect from."
-                  : "Drop the pin on your door, or search for your address."}
+                  ? t.subPickup
+                  : t.subDelivery}
             </p>
           </div>
 
@@ -263,18 +364,21 @@ function OrderModal({
                 onClick={onBack}
                 className="mt-5 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--cream)]/60 hover:text-[color:var(--gold)] transition-colors duration-300"
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back
+                <ArrowLeft className={`h-3.5 w-3.5 ${isRTL ? "rotate-180" : ""}`} />
+                {t.back}
               </button>
             </div>
           ) : (
-            /* Sliding stage for choice / pickup */
             <div className="relative mt-8 overflow-hidden">
               <div
                 className="flex w-[200%] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 style={{
                   transform:
-                    step === "pickup" ? "translateX(-50%)" : "translateX(0%)",
+                    step === "pickup"
+                      ? isRTL
+                        ? "translateX(50%)"
+                        : "translateX(-50%)"
+                      : "translateX(0%)",
                 }}
               >
                 {/* Step 1: Choice */}
@@ -282,14 +386,14 @@ function OrderModal({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <ChoiceCard
                       icon={<ShoppingBag className="h-6 w-6" />}
-                      label="Pickup"
-                      hint="Ready at the counter"
+                      label={t.pickup}
+                      hint={t.pickupHint}
                       onClick={onPickup}
                     />
                     <ChoiceCard
                       icon={<Bike className="h-6 w-6" />}
-                      label="Delivery"
-                      hint="Straight to your door"
+                      label={t.delivery}
+                      hint={t.deliveryHint}
                       onClick={onDelivery}
                     />
                   </div>
@@ -310,13 +414,13 @@ function OrderModal({
                           </span>
                           <span className="flex-1">
                             <span className="block font-display text-xl leading-tight text-[color:var(--cream)]">
-                              {b.name}
+                              {b.name[lang]}
                             </span>
                             <span className="block text-xs text-[color:var(--cream)]/55">
-                              {b.tagline}
+                              {b.tagline[lang]}
                             </span>
                           </span>
-                          <ArrowRight className="h-4 w-4 text-[color:var(--cream)]/40 transition-all duration-300 group-hover:text-[color:var(--gold)] group-hover:translate-x-1" />
+                          <ArrowRight className={`h-4 w-4 text-[color:var(--cream)]/40 transition-all duration-300 group-hover:text-[color:var(--gold)] group-hover:translate-x-1 ${isRTL ? "rotate-180" : ""}`} />
                         </button>
                       </li>
                     ))}
@@ -326,8 +430,8 @@ function OrderModal({
                     onClick={onBack}
                     className="mt-5 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--cream)]/60 hover:text-[color:var(--gold)] transition-colors duration-300"
                   >
-                    <ArrowLeft className="h-3.5 w-3.5" />
-                    Back
+                    <ArrowLeft className={`h-3.5 w-3.5 ${isRTL ? "rotate-180" : ""}`} />
+                    {t.back}
                   </button>
                 </div>
               </div>
