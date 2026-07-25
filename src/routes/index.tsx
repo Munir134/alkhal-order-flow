@@ -32,7 +32,7 @@ const BRANCHES = [
   },
 ];
 
-type Step = "choice" | "pickup";
+type Step = "choice" | "pickup" | "delivery";
 
 function Index() {
   const [open, setOpen] = useState(false);
