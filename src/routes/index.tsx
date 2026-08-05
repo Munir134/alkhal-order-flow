@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -64,10 +64,13 @@ function Index() {
     }
   }, []);
 
+  // Whether user has already made a choice before (can dismiss modal)
+  const hasChosen = activeFulfillment !== null;
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape" && hasChosen) setOpen(false);
     };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
@@ -85,6 +88,18 @@ function Index() {
     }
   }, [open]);
 
+  const MENU_URL = "https://damascene.vercel.app/";
+
+  const redirectToMenu = (destination: string, fulfillmentData: ActiveFulfillment) => {
+    try {
+      localStorage.setItem("alkhal_fulfillment", JSON.stringify(fulfillmentData));
+    } catch {}
+    // Small delay for smooth close animation before redirect
+    setTimeout(() => {
+      window.location.href = destination;
+    }, 300);
+  };
+
   const handleConfirmPickup = (data: {
     branch: Branch;
     pickupType: PickupType;
@@ -97,10 +112,8 @@ function Index() {
       vehicleDetails: data.vehicleDetails,
     };
     setActiveFulfillment(fulfillmentData);
-    try {
-      localStorage.setItem("alkhal_fulfillment", JSON.stringify(fulfillmentData));
-    } catch {}
     setOpen(false);
+    redirectToMenu(data.branch.url, fulfillmentData);
   };
 
   const handleConfirmDelivery = (loc: {
@@ -113,10 +126,8 @@ function Index() {
       location: loc,
     };
     setActiveFulfillment(fulfillmentData);
-    try {
-      localStorage.setItem("alkhal_fulfillment", JSON.stringify(fulfillmentData));
-    } catch {}
     setOpen(false);
+    redirectToMenu(MENU_URL, fulfillmentData);
   };
 
   return (
@@ -247,7 +258,8 @@ function Index() {
       <OrderModal
         open={open}
         step={step}
-        onClose={() => setOpen(false)}
+        hasChosen={hasChosen}
+        onClose={() => { if (hasChosen) setOpen(false); }}
         onDelivery={() => setStep("delivery")}
         onConfirmDelivery={handleConfirmDelivery}
         onConfirmPickup={handleConfirmPickup}
@@ -261,6 +273,7 @@ function Index() {
 function OrderModal({
   open,
   step,
+  hasChosen,
   onClose,
   onDelivery,
   onConfirmDelivery,
@@ -270,6 +283,7 @@ function OrderModal({
 }: {
   open: boolean;
   step: Step;
+  hasChosen: boolean;
   onClose: () => void;
   onDelivery: () => void;
   onConfirmDelivery: (loc: { lat: number; lng: number; address: string }) => void;
@@ -288,10 +302,10 @@ function OrderModal({
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
     >
-      {/* Backdrop */}
+      {/* Backdrop — only dismissible if user has already chosen */}
       <div
-        onClick={onClose}
-        className="absolute inset-0 bg-[color:var(--charcoal-deep)]/85 backdrop-blur-sm"
+        onClick={hasChosen ? onClose : undefined}
+        className={`absolute inset-0 bg-[color:var(--charcoal-deep)]/85 backdrop-blur-sm ${hasChosen ? "cursor-pointer" : "cursor-default"}`}
       />
 
       {/* Panel */}
@@ -309,13 +323,16 @@ function OrderModal({
             "radial-gradient(circle at 0% 0%, oklch(0.75 0.13 82 / 0.08), transparent 55%)",
         }}
       >
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-4 top-4 z-10 rounded-full p-2 text-[color:var(--cream)]/60 hover:text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        {/* Only show close button if user has already chosen before */}
+        {hasChosen && (
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-4 top-4 z-10 rounded-full p-2 text-[color:var(--cream)]/60 hover:text-[color:var(--cream)] hover:bg-[color:var(--cream)]/10 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
 
         <div className="px-6 sm:px-8 pt-10 pb-8">
           {/* Header */}
