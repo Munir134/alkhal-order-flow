@@ -308,20 +308,29 @@ function Index() {
             Heritage recipes, hand-plated. From the old city of Damascus to your table.
           </p>
 
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-12 flex flex-col items-center justify-center gap-3">
+            {/* PRIMARY: Order Now — straight to the menu */}
             <button
-              onClick={() => setOpen(true)}
+              onClick={goToMenuNow}
               className="group inline-flex items-center gap-2 rounded-full bg-[color:var(--gold)] px-8 py-4 text-sm font-semibold text-[color:var(--charcoal-deep)] shadow-[0_10px_40px_-10px_oklch(0.75_0.13_82/0.6)] hover:bg-[color:var(--gold-deep)] hover:text-[color:var(--cream)] transition-colors duration-300"
             >
-              {activeFulfillment ? (
-                <Edit3 className="h-4 w-4" />
-              ) : (
-                <ShoppingBag className="h-4 w-4" />
-              )}
-              {activeFulfillment ? "Change Order Mode" : "Order Now"}
+              <ShoppingBag className="h-4 w-4" />
+              Order Now
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
             </button>
+
+            {/* SECONDARY: Change Order Mode */}
+            {activeFulfillment && (
+              <button
+                onClick={() => { setStep("choice"); setOpen(true); }}
+                className="inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--gold)]/10 px-6 py-3 text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold)] hover:bg-[color:var(--gold)] hover:text-[color:var(--charcoal-deep)] transition-all duration-300"
+              >
+                <Edit3 className="h-3.5 w-3.5" />
+                Change Order Mode
+              </button>
+            )}
           </div>
+
         </div>
       </section>
 
