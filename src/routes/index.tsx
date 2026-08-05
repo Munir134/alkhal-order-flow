@@ -83,10 +83,15 @@ const T = {
 
 type Step = "choice" | "pickup" | "delivery";
 
+type Selection =
+  | { mode: "pickup"; branchId: string }
+  | { mode: "delivery"; lat: number; lng: number; address: string };
+
 function Index() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("choice");
   const [lang, setLang] = useState<Lang>("en");
+  const [selection, setSelection] = useState<Selection | null>(null);
   const t = T[lang];
   const isRTL = lang === "ar";
 
@@ -100,7 +105,19 @@ function Index() {
     }
     const savedLang = localStorage.getItem("alkhal_lang");
     if (savedLang === "ar" || savedLang === "en") setLang(savedLang);
+    try {
+      const raw = localStorage.getItem("alkhal_selection");
+      if (raw) setSelection(JSON.parse(raw) as Selection);
+    } catch {}
   }, []);
+
+  const saveSelection = (next: Selection) => {
+    setSelection(next);
+    try {
+      localStorage.setItem("alkhal_selection", JSON.stringify(next));
+    } catch {}
+  };
+
 
   useEffect(() => {
     if (typeof document === "undefined") return;
