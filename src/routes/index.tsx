@@ -191,6 +191,42 @@ function Index() {
           {t.switchLang}
         </button>
 
+        {/* Fulfillment pill (AlBaik-style) */}
+        {selection && (
+          <button
+            onClick={() => {
+              setStep("choice");
+              setOpen(true);
+            }}
+            aria-label={t.change}
+            className={`absolute top-6 z-20 flex max-w-[65vw] sm:max-w-xs items-center gap-3 rounded-full border border-[color:var(--gold)]/35 bg-[color:var(--charcoal-deep)]/70 backdrop-blur px-4 py-2 text-start text-[color:var(--cream)] hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/70 transition-colors duration-300 ${
+              isRTL ? "right-6" : "left-6"
+            }`}
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)]">
+              {selection.mode === "delivery" ? (
+                <Bike className="h-4 w-4" />
+              ) : (
+                <MapPin className="h-4 w-4" />
+              )}
+            </span>
+            <span className="min-w-0">
+              <span className="flex items-center gap-1 text-[0.65rem] uppercase tracking-[0.3em] text-[color:var(--gold)]">
+                {selection.mode === "delivery" ? t.delivery : t.pickup}
+                <ChevronDown className="h-3 w-3" />
+              </span>
+              <span className="block truncate text-sm text-[color:var(--cream)]/85">
+                {selection.mode === "delivery"
+                  ? selection.address || t.deliveryHint
+                  : (BRANCHES.find((b) => b.id === selection.branchId)?.name[lang] ??
+                    t.pickupHint)}
+              </span>
+            </span>
+          </button>
+        )}
+
+
+
         <div className="relative mx-auto max-w-5xl px-6 py-24 sm:py-32 text-center text-[color:var(--cream)] w-full">
           <div className="mx-auto flex items-center justify-center gap-4 mb-6">
             <span className="h-px w-14 bg-[color:var(--gold)]/60" />
