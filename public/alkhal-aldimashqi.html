@@ -97,9 +97,42 @@
     font-family:inherit;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;
     display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;transition:color .3s}
   .back:hover{color:var(--gold)}
+  /* BARN'S / ALBAIK FULFILLMENT HEADER */
+  .fulfillment-bar{position:fixed;top:0;left:0;right:0;z-index:40;background:rgba(13,11,9,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(212,162,74,.2);padding:.5rem 1rem;display:none}
+  .fulfillment-bar.active{display:block}
+  .fulfillment-bar .bar-content{max-width:64rem;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+  .fulfillment-bar .left-group{display:flex;align-items:center;gap:.75rem;cursor:pointer;background:none;border:none;padding:0;color:inherit;text-align:left}
+  .fulfillment-bar .pin-icon{width:2rem;height:2rem;color:var(--cream);flex-shrink:0}
+  .fulfillment-bar .title-row{display:flex;align-items:center;gap:.35rem;font-weight:600;font-size:.95rem;color:var(--cream);line-height:1.1}
+  .fulfillment-bar .sub-addr{font-size:.75rem;color:rgba(242,232,216,.6);line-height:1.1;margin-top:.15rem;display:block}
+  .fulfillment-bar .change-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .85rem;border-radius:999px;border:1px solid rgba(212,162,74,.4);background:rgba(212,162,74,.1);color:var(--gold);font-size:.75rem;font-weight:500;cursor:pointer;transition:all .3s}
+  .fulfillment-bar .change-btn:hover{background:var(--gold);color:var(--charcoal-deep)}
 </style>
 </head>
 <body>
+
+<!-- BARN'S STYLE HEADER INDICATOR -->
+<div class="fulfillment-bar" id="fulfillmentBar">
+  <div class="bar-content">
+    <button class="left-group" id="barChangeBtn">
+      <svg class="pin-icon" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="12" cy="8" r="5" />
+        <path d="M12 13 L12 22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none" />
+      </svg>
+      <div>
+        <div class="title-row">
+          <span id="barTitle">Delivery</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <span class="sub-addr" id="barSubText">Location Selected</span>
+      </div>
+    </button>
+    <button class="change-btn" id="barChangeActionBtn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Change
+    </button>
+  </div>
+</div>
 
 <section class="hero">
   <img class="bg" src="hero.jpg" alt="A Damascene feast with candlelight and heritage plating" />
@@ -202,20 +235,31 @@
     list.appendChild(li);
   });
 
-  document.getElementById('openBtn').addEventListener('click', openModal);
-  document.getElementById('pickupBtn').addEventListener('click', ()=>setStep('pickup'));
-  document.getElementById('deliveryBtn').addEventListener('click', goToMenu);
-  document.getElementById('backBtn').addEventListener('click', ()=>setStep('choice'));
-  document.querySelectorAll('[data-close]').forEach(el=>el.addEventListener('click', closeModal));
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  // Fulfillment header restore
+  function updateFulfillmentBar() {
+    try {
+      const saved = localStorage.getItem('alkhal_fulfillment');
+      if (saved) {
+        const data = JSON.parse(saved);
+        const bar = document.getElementById('fulfillmentBar');
+        const title = document.getElementById('barTitle');
+        const sub = document.getElementById('barSubText');
 
-  // Open on first visit per session
-  try {
-    if(!sessionStorage.getItem('alkhal_fulfillment_seen')){
-      openModal();
-      sessionStorage.setItem('alkhal_fulfillment_seen','1');
-    }
-  } catch(_) { openModal(); }
+        if (data.type === 'pickup') {
+          title.textContent = data.pickupType === 'drive_thru' ? 'Drive-Thru' : 'Pickup';
+          sub.textContent = data.branch ? data.branch.name : 'Branch Selected';
+        } else {
+          title.textContent = 'Delivery';
+          sub.textContent = (data.location && data.location.address) ? data.location.address.split(',')[0] : 'Location Selected';
+        }
+        bar.classList.add('active');
+      }
+    } catch (_) {}
+  }
+
+  updateFulfillmentBar();
+  document.getElementById('barChangeBtn').addEventListener('click', openModal);
+  document.getElementById('barChangeActionBtn').addEventListener('click', openModal);
 </script>
 </body>
 </html>
