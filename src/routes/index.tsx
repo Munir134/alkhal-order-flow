@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -145,7 +145,7 @@ function Index() {
                   </span>
                   {activeFulfillment.vehicleDetails?.plateNumber && (
                     <span className="text-[color:var(--cream)]/60 hidden md:inline">
-                      • {activeFulfillment.vehicleDetails.carModel} (
+                      ظت {activeFulfillment.vehicleDetails.carModel} (
                       {activeFulfillment.vehicleDetails.plateNumber})
                     </span>
                   )}
