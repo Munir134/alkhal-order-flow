@@ -17,10 +17,15 @@ import PickupFulfillment, {
   PickupType,
   VehicleDetails,
 } from "@/components/PickupFulfillment";
+import FulfillmentSwitcher, {
+  ModeIcon,
+  SwitcherMode,
+} from "@/components/FulfillmentSwitcher";
 
 const DeliveryLocationPicker = lazy(
   () => import("@/components/DeliveryLocationPicker"),
 );
+
 
 export const Route = createFileRoute("/")({
   component: Index,
