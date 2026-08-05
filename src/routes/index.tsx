@@ -116,7 +116,7 @@ function Index() {
     };
     setActiveFulfillment(fulfillmentData);
     setOpen(false);
-    redirectToMenu(data.branch.url, fulfillmentData);
+    redirectToMenu(MENU_URL, fulfillmentData);
   };
 
   const handleConfirmDelivery = (loc: {
@@ -132,6 +132,40 @@ function Index() {
     setOpen(false);
     redirectToMenu(MENU_URL, fulfillmentData);
   };
+
+  // Straight to the menu site using the already-saved choice
+  const goToMenuNow = () => {
+    if (activeFulfillment) {
+      redirectToMenu(MENU_URL, activeFulfillment);
+    } else {
+      setStep("choice");
+      setOpen(true);
+    }
+  };
+
+  const openStep = (mode: SwitcherMode) => {
+    setSwitcherOpen(false);
+    setStep(mode === "pickup" ? "pickup" : "delivery");
+    setOpen(true);
+  };
+
+  const activeMode: SwitcherMode =
+    activeFulfillment?.type === "delivery" ? "delivery" : "pickup";
+
+  const activeModeLabel =
+    activeFulfillment?.type === "pickup"
+      ? activeFulfillment.pickupType === "drive_thru"
+        ? "Drive-Thru"
+        : "Pickup"
+      : "Delivery";
+
+  const activeSubLabel =
+    activeFulfillment?.type === "pickup"
+      ? activeFulfillment.branch.name
+      : activeFulfillment?.type === "delivery"
+        ? activeFulfillment.location.address?.split(",")[0] || "Location Selected"
+        : "";
+
 
   return (
     <main className="min-h-screen relative">
