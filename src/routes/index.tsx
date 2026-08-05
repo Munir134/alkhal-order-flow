@@ -55,6 +55,8 @@ const T = {
     deliveryHint: "Straight to your door",
     back: "Back",
     close: "Close",
+    change: "Change",
+  },
   },
   ar: {
     tagline: "نكهة من دمشق",
