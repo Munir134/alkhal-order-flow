@@ -285,9 +285,13 @@ function Index() {
           try {
             sessionStorage.setItem("alkhal_delivery", JSON.stringify(loc));
           } catch {}
+          saveSelection({ mode: "delivery", ...loc });
           goToMenu();
         }}
-        onSelectBranch={goToMenu}
+        onSelectBranch={(branchId) => {
+          saveSelection({ mode: "pickup", branchId });
+          goToMenu();
+        }}
         onPickup={() => setStep("pickup")}
         onBack={() => setStep("choice")}
       />
