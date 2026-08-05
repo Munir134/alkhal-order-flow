@@ -465,7 +465,7 @@ function OrderModal({
                       <li key={b.id}>
                         <button
                           type="button"
-                          onClick={onSelectBranch}
+                          onClick={() => onSelectBranch(b.id)}
                           className="group flex w-full items-center gap-4 rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/60 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/40"
                         >
                           <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)] transition-colors duration-300 group-hover:bg-[color:var(--gold)] group-hover:text-[color:var(--charcoal-deep)]">
