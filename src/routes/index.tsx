@@ -48,10 +48,11 @@ export type ActiveFulfillment =
 function Index() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("choice");
+  const [switcherOpen, setSwitcherOpen] = useState(false);
   const [activeFulfillment, setActiveFulfillment] =
     useState<ActiveFulfillment | null>(null);
 
-  // Restore fulfillment from localStorage / sessionStorage
+  // Restore fulfillment from localStorage, then always show the selector
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -62,12 +63,9 @@ function Index() {
       }
     } catch {}
 
-    const seen = sessionStorage.getItem("alkhal_fulfillment_seen");
-    if (!seen) {
-      setOpen(true);
-      sessionStorage.setItem("alkhal_fulfillment_seen", "1");
-    }
+    setOpen(true);
   }, []);
+
 
   // Whether user has already made a choice before (can dismiss modal)
   const hasChosen = activeFulfillment !== null;
