@@ -77,6 +77,7 @@ const T = {
     deliveryHint: "إلى باب بيتك",
     back: "رجوع",
     close: "إغلاق",
+    change: "تغيير",
   },
 } as const;
 
