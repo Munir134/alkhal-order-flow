@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2, Languages } from "lucide-react";
+import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2, Languages, ChevronDown } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
 
 const DeliveryLocationPicker = lazy(
@@ -55,6 +55,7 @@ const T = {
     deliveryHint: "Straight to your door",
     back: "Back",
     close: "Close",
+    change: "Change",
   },
   ar: {
     tagline: "نكهة من دمشق",
@@ -76,15 +77,21 @@ const T = {
     deliveryHint: "إلى باب بيتك",
     back: "رجوع",
     close: "إغلاق",
+    change: "تغيير",
   },
 } as const;
 
 type Step = "choice" | "pickup" | "delivery";
 
+type Selection =
+  | { mode: "pickup"; branchId: string }
+  | { mode: "delivery"; lat: number; lng: number; address: string };
+
 function Index() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("choice");
   const [lang, setLang] = useState<Lang>("en");
+  const [selection, setSelection] = useState<Selection | null>(null);
   const t = T[lang];
   const isRTL = lang === "ar";
 
@@ -98,7 +105,19 @@ function Index() {
     }
     const savedLang = localStorage.getItem("alkhal_lang");
     if (savedLang === "ar" || savedLang === "en") setLang(savedLang);
+    try {
+      const raw = localStorage.getItem("alkhal_selection");
+      if (raw) setSelection(JSON.parse(raw) as Selection);
+    } catch {}
   }, []);
+
+  const saveSelection = (next: Selection) => {
+    setSelection(next);
+    try {
+      localStorage.setItem("alkhal_selection", JSON.stringify(next));
+    } catch {}
+  };
+
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -172,6 +191,42 @@ function Index() {
           {t.switchLang}
         </button>
 
+        {/* Fulfillment pill (AlBaik-style) */}
+        {selection && (
+          <button
+            onClick={() => {
+              setStep("choice");
+              setOpen(true);
+            }}
+            aria-label={t.change}
+            className={`absolute top-6 z-20 flex max-w-[65vw] sm:max-w-xs items-center gap-3 rounded-full border border-[color:var(--gold)]/35 bg-[color:var(--charcoal-deep)]/70 backdrop-blur px-4 py-2 text-start text-[color:var(--cream)] hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/70 transition-colors duration-300 ${
+              isRTL ? "right-6" : "left-6"
+            }`}
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)]">
+              {selection.mode === "delivery" ? (
+                <Bike className="h-4 w-4" />
+              ) : (
+                <MapPin className="h-4 w-4" />
+              )}
+            </span>
+            <span className="min-w-0">
+              <span className="flex items-center gap-1 text-[0.65rem] uppercase tracking-[0.3em] text-[color:var(--gold)]">
+                {selection.mode === "delivery" ? t.delivery : t.pickup}
+                <ChevronDown className="h-3 w-3" />
+              </span>
+              <span className="block truncate text-sm text-[color:var(--cream)]/85">
+                {selection.mode === "delivery"
+                  ? selection.address || t.deliveryHint
+                  : (BRANCHES.find((b) => b.id === selection.branchId)?.name[lang] ??
+                    t.pickupHint)}
+              </span>
+            </span>
+          </button>
+        )}
+
+
+
         <div className="relative mx-auto max-w-5xl px-6 py-24 sm:py-32 text-center text-[color:var(--cream)] w-full">
           <div className="mx-auto flex items-center justify-center gap-4 mb-6">
             <span className="h-px w-14 bg-[color:var(--gold)]/60" />
@@ -230,9 +285,13 @@ function Index() {
           try {
             sessionStorage.setItem("alkhal_delivery", JSON.stringify(loc));
           } catch {}
+          saveSelection({ mode: "delivery", ...loc });
           goToMenu();
         }}
-        onSelectBranch={goToMenu}
+        onSelectBranch={(branchId) => {
+          saveSelection({ mode: "pickup", branchId });
+          goToMenu();
+        }}
         onPickup={() => setStep("pickup")}
         onBack={() => setStep("choice")}
       />
@@ -263,7 +322,7 @@ function OrderModal({
   onClose: () => void;
   onDelivery: () => void;
   onConfirmDelivery: (loc: { lat: number; lng: number; address: string }) => void;
-  onSelectBranch: () => void;
+  onSelectBranch: (branchId: string) => void;
   onPickup: () => void;
   onBack: () => void;
 }) {
@@ -406,7 +465,7 @@ function OrderModal({
                       <li key={b.id}>
                         <button
                           type="button"
-                          onClick={onSelectBranch}
+                          onClick={() => onSelectBranch(b.id)}
                           className="group flex w-full items-center gap-4 rounded-xl border border-[color:var(--cream)]/10 bg-[color:var(--charcoal-soft)]/60 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-[color:var(--charcoal-deep)] hover:border-[color:var(--gold)]/40"
                         >
                           <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--gold)]/40 text-[color:var(--gold)] transition-colors duration-300 group-hover:bg-[color:var(--gold)] group-hover:text-[color:var(--charcoal-deep)]">
