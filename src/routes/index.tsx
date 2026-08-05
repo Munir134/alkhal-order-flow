@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2, Languages } from "lucide-react";
+import { ArrowRight, ArrowLeft, ShoppingBag, MapPin, Bike, X, Loader2, Languages, ChevronDown } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
 
 const DeliveryLocationPicker = lazy(
