@@ -322,7 +322,7 @@ function OrderModal({
   onClose: () => void;
   onDelivery: () => void;
   onConfirmDelivery: (loc: { lat: number; lng: number; address: string }) => void;
-  onSelectBranch: () => void;
+  onSelectBranch: (branchId: string) => void;
   onPickup: () => void;
   onBack: () => void;
 }) {
