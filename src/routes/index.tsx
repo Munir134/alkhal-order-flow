@@ -132,57 +132,90 @@ function Index() {
 
   return (
     <main className="min-h-screen relative">
-      {/* PERSISTENT FULFILLMENT HEADER BADGE */}
+      {/* FULFILLMENT MODE INDICATOR — BARN'S / AlBaik style */}
       {activeFulfillment && (
-        <div className="fixed top-0 left-0 right-0 z-40 bg-[color:var(--charcoal-deep)]/90 backdrop-blur-md border-b border-[color:var(--gold)]/20 py-2.5 px-4 animate-in slide-in-from-top duration-300">
-          <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 text-xs sm:text-sm">
-            <div className="flex items-center gap-2 text-[color:var(--cream)] truncate">
-              {activeFulfillment.type === "pickup" ? (
-                <>
-                  <span className="p-1 rounded bg-[color:var(--gold)]/20 text-[color:var(--gold)] flex items-center gap-1">
-                    {activeFulfillment.pickupType === "drive_thru" ? (
-                      <Car className="h-3.5 w-3.5" />
-                    ) : (
-                      <Store className="h-3.5 w-3.5" />
-                    )}
-                    <span className="font-semibold uppercase tracking-wider text-[0.65rem]">
-                      {activeFulfillment.pickupType === "drive_thru"
-                        ? "Drive-Thru"
-                        : "Counter Pickup"}
-                    </span>
-                  </span>
-                  <span className="font-medium text-[color:var(--gold)]">
-                    {activeFulfillment.branch.name}
-                  </span>
-                  {activeFulfillment.vehicleDetails?.plateNumber && (
-                    <span className="text-[color:var(--cream)]/60 hidden md:inline">
-                      ظت {activeFulfillment.vehicleDetails.carModel} (
-                      {activeFulfillment.vehicleDetails.plateNumber})
-                    </span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <span className="p-1 rounded bg-[color:var(--gold)]/20 text-[color:var(--gold)] flex items-center gap-1">
-                    <Bike className="h-3.5 w-3.5" />
-                    <span className="font-semibold uppercase tracking-wider text-[0.65rem]">
-                      Delivery
-                    </span>
-                  </span>
-                  <span className="truncate text-[color:var(--cream)]/90">
-                    {activeFulfillment.location.address || "Location Selected"}
-                  </span>
-                </>
-              )}
-            </div>
+        <div className="fixed top-0 left-0 right-0 z-40 bg-[color:var(--charcoal-deep)]/95 backdrop-blur-md border-b border-[color:var(--gold)]/15 animate-in slide-in-from-top duration-300">
+          <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 px-4 sm:px-6 py-2">
 
+            {/* LEFT: Pin icon + mode + address */}
             <button
               onClick={() => setOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--gold)]/10 text-[color:var(--gold)] text-xs font-medium hover:bg-[color:var(--gold)] hover:text-[color:var(--charcoal-deep)] transition-all flex-shrink-0"
+              className="flex items-center gap-3 group min-w-0"
             >
-              <Edit3 className="h-3 w-3" />
-              Change
+              {/* Location pin SVG — matches reference exactly */}
+              <div className="flex-shrink-0 relative">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-8 w-8 text-[color:var(--cream)]"
+                  fill="currentColor"
+                >
+                  {/* Pin head circle */}
+                  <circle cx="12" cy="8" r="5" />
+                  {/* Pin stem */}
+                  <path d="M12 13 L12 22" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                </svg>
+              </div>
+
+              {/* Mode label + sub-text */}
+              <div className="flex flex-col items-start min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-[color:var(--cream)] text-sm sm:text-base leading-tight">
+                    {activeFulfillment.type === "pickup"
+                      ? activeFulfillment.pickupType === "drive_thru"
+                        ? "Drive-Thru"
+                        : "Pickup"
+                      : "Delivery"}
+                  </span>
+                  {/* Chevron dropdown indicator */}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-3.5 w-3.5 text-[color:var(--cream)]/70 flex-shrink-0 group-hover:text-[color:var(--gold)] transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+
+                {/* Sub-text: branch name or truncated address */}
+                <span className="text-xs text-[color:var(--cream)]/60 truncate max-w-[160px] sm:max-w-xs leading-tight group-hover:text-[color:var(--gold)]/80 transition-colors">
+                  {activeFulfillment.type === "pickup"
+                    ? activeFulfillment.branch.name
+                    : activeFulfillment.location.address
+                        ? activeFulfillment.location.address.split(",")[0]
+                        : "Location Selected"}
+                </span>
+              </div>
             </button>
+
+            {/* RIGHT: subtle gold dot accent (like BARN'S app) */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Active mode pill */}
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[color:var(--gold)]/15 border border-[color:var(--gold)]/30 text-[color:var(--gold)] text-[0.65rem] font-semibold uppercase tracking-widest">
+                {activeFulfillment.type === "pickup" ? (
+                  activeFulfillment.pickupType === "drive_thru" ? (
+                    <><Car className="h-3 w-3" /> Drive-Thru</>
+                  ) : (
+                    <><Store className="h-3 w-3" /> Counter</>
+                  )
+                ) : (
+                  <><Bike className="h-3 w-3" /> Delivery</>
+                )}
+              </span>
+
+              {/* Change button */}
+              <button
+                onClick={() => setOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--gold)]/10 text-[color:var(--gold)] text-xs font-medium hover:bg-[color:var(--gold)] hover:text-[color:var(--charcoal-deep)] transition-all duration-300"
+              >
+                <Edit3 className="h-3 w-3" />
+                <span className="hidden sm:inline">Change</span>
+              </button>
+            </div>
+
           </div>
         </div>
       )}
